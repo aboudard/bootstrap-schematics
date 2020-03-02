@@ -1,7 +1,10 @@
 {
   "name": "bootstrap-schematics",
   "version": "0.0.0",
-  "description": "A blank schematics",
+  "description": "Angular schematics for bootstrap",
+  "repository": "aboudard/bootstrap-schematic",
+  "bugs": "https://github.com/aboudard/bootstrap-schematic/issues",
+  "homepage": "https://github.com/aboudard/bootstrap-schematic",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
@@ -10,18 +13,22 @@
     "clean": "git checkout HEAD -- sandbox && git clean -f -d sandbox",
     "test": "npm run clean && npm run sandbox:ng-add && npm run test:sandbox",
     "test:unit": "npm run build && jasmine src/**/*_spec.js",
-    "test:sandbox": "cd sandbox && npm run lint && npm run test && npm run build"
+    "test:sandbox": "cd sandbox && npm run lint && npm run test && npm run build",
+    "publish": "npm run build && np",
   },
   "keywords": [
     "schematics"
   ],
-  "author": "",
+  "author": "aboudard",
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {
     "@angular-devkit/core": "^9.0.4",
     "@angular-devkit/schematics": "^9.0.4",
     "typescript": "~3.7.4"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
     "@types/node": "^12.11.1",
