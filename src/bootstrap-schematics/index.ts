@@ -1,8 +1,8 @@
-import { Rule, SchematicContext, Tree, chain } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, Tree, chain, mergeWith, apply, url, move, SchematicsException } from '@angular-devkit/schematics';
 import { Observable, concat, of } from "rxjs";
 import { concatMap, map } from "rxjs/operators";
 import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks";
-import { getLatestNodeVersion, NodePackage } from '../utility/util';
+import { getLatestNodeVersion, NodePackage, parseJsonAtPath } from '../utility/util';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 
 // You don't have to export the function as default. You can also have more than one rule factory
@@ -12,7 +12,9 @@ export function bootstrapSchematics(_options: any): Rule {
     console.log(_options);
     return chain([
       updateDependencies(),
-      installDependencies()
+      installDependencies(),
+      addBootstrapFiles(),
+      modifyAngularJson()
     ])(tree, _context);
   };
 }
@@ -52,4 +54,54 @@ function installDependencies(): Rule {
     _context.logger.debug('✅️ Dependencies installed');
     return tree;
   };
+}
+
+function addBootstrapFiles(): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    context.logger.debug("Adding bootstrap files");
+    return chain([
+      mergeWith(apply(url("./assets"), [move("./src/assets")])),
+      mergeWith(apply(url("./icon"), [move("./")]))
+    ])(
+      tree,
+      context
+    );
+  };
+}
+
+function getAngularJsonValue(tree: Tree) {
+  const angularJsonAst = parseJsonAtPath(tree, "./angular.json");
+  return angularJsonAst.value as any;
+}
+
+function getProject(angularJsonValue: any) {
+  return angularJsonValue.defaultProject;
+}
+
+function modifyAngularJson(): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    if (tree.exists("./angular.json")) {
+      const angularJsonVal = getAngularJsonValue(tree);
+      const project = getProject(angularJsonVal);
+      const projectStylesOptionsJson = angularJsonVal["projects"][project]["architect"]["build"]["options"];
+      const projectStylesTestJson = angularJsonVal["projects"][project]["architect"]["test"]["options"];
+      const styles = [
+        "src/assets/vendor.scss"
+      ];
+      projectStylesOptionsJson["styles"] = styles;
+      projectStylesTestJson["styles"] = styles;
+
+      context.logger.debug(
+        `Adding bootstrap scss override in angular.json style`
+      );
+
+      return tree.overwrite(
+        "./angular.json",
+        JSON.stringify(angularJsonVal, null, 2)
+      );
+
+    } else {
+      throw new SchematicsException("angular.json not found");
+    }
+  }
 }
