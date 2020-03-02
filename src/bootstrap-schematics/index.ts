@@ -12,6 +12,7 @@ export function bootstrapSchematics(_options: any): Rule {
     console.log(_options);
     return chain([
       updateDependencies(),
+      installDependencies()
     ])(tree, _context);
   };
 }
@@ -43,4 +44,12 @@ function updateDependencies(): Rule {
     );
     return concat(addDependencies);
   }
+}
+
+function installDependencies(): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    _context.addTask(new NodePackageInstallTask());
+    _context.logger.debug('✅️ Dependencies installed');
+    return tree;
+  };
 }
