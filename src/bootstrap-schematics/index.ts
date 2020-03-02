@@ -1,4 +1,4 @@
-import { Rule, SchematicContext, Tree, chain, mergeWith, apply, url, move, SchematicsException } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, Tree, chain, mergeWith, apply, url, move, SchematicsException, noop } from '@angular-devkit/schematics';
 import { Observable, concat, of } from "rxjs";
 import { concatMap, map } from "rxjs/operators";
 import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks";
@@ -13,10 +13,23 @@ export function bootstrapSchematics(_options: any): Rule {
     return chain([
       updateDependencies(),
       installDependencies(),
+      _options.removeStyles ? removeFiles() : noop(),
       addBootstrapFiles(),
-      modifyAngularJson()
+      modifyAngularJson(_options)
     ])(tree, _context);
   };
+}
+
+function removeFiles(): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    context.logger.debug("Removing styles default file");
+    if (tree.exists("./src/styles.scss")) {
+      tree.delete("./src/styles.scss");
+    }
+    if (tree.exists("./src/styles.css")) {
+      tree.delete("./src/styles.css");
+    }
+  }
 }
 
 function updateDependencies(): Rule {
@@ -78,7 +91,7 @@ function getProject(angularJsonValue: any) {
   return angularJsonValue.defaultProject;
 }
 
-function modifyAngularJson(): Rule {
+function modifyAngularJson(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
     if (tree.exists("./angular.json")) {
       const angularJsonVal = getAngularJsonValue(tree);
@@ -88,8 +101,14 @@ function modifyAngularJson(): Rule {
       const styles = [
         "src/assets/vendor.scss"
       ];
-      projectStylesOptionsJson["styles"] = styles;
-      projectStylesTestJson["styles"] = styles;
+      if (options.removeStyles) {
+        projectStylesOptionsJson["styles"] = styles;
+        projectStylesTestJson["styles"] = styles;
+      } else {
+        Array.prototype.push.apply(projectStylesOptionsJson["styles"], styles);
+        Array.prototype.push.apply(projectStylesTestJson["styles"], styles);
+      }
+
 
       context.logger.debug(
         `Adding bootstrap scss override in angular.json style`

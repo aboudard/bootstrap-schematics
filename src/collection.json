@@ -6,7 +6,8 @@
       "factory": "./bootstrap-schematics/index#bootstrapSchematics",
       "aliases": [
         "install"
-      ]
+      ],
+      "schema": "./bootstrap-schematics/schema.json"
     }
   }
 }

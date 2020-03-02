@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "id": "AngularBootstrapNgAdd",
+    "title": "Bootstrap Install Schema",
+    "type": "object",
+    "properties": {
+        "removeStyles": {
+            "description": "When true, removes the default syles.css in root folder",
+            "type": "boolean",
+            "$default": {
+                "$source": "argv",
+                "index": 0
+            },
+            "x-prompt": "Would you like to remove default styles.scss / styles.css from the project ?"
+        }
+    },
+    "required": []
+}
