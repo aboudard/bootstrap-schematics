@@ -5,7 +5,12 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
-    "test": "npm run build && jasmine src/**/*_spec.js"
+    "link:schematic": "npm link && cd sandbox && npm link \"bootstrap-schematics\"",
+    "sandbox:ng-add": "cd sandbox && ng g bootstrap-schematics:ng-add",
+    "clean": "git checkout HEAD -- sandbox && git clean -f -d sandbox",
+    "test": "npm run clean && npm run sandbox:ng-add && npm run test:sandbox",
+    "test:unit": "npm run build && jasmine src/**/*_spec.js",
+    "test:sandbox": "cd sandbox && npm run lint && npm run test && npm run build"
   },
   "keywords": [
     "schematics"

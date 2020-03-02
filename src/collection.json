@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
-    "bootstrap-schematics": {
+    "ng-add": {
       "description": "A blank schematic.",
       "factory": "./bootstrap-schematics/index#bootstrapSchematics",
       "aliases": [
