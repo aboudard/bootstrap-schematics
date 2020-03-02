@@ -39,7 +39,8 @@ function updateDependencies(): Rule {
     context.addTask(new NodePackageInstallTask());
     const addDependencies = of(
       "bootstrap",
-      "@ng-bootstrap/ng-bootstrap"
+      "@ng-bootstrap/ng-bootstrap",
+      "@angular/localize"
     ).pipe(
       concatMap((packageName: string) => getLatestNodeVersion(packageName)),
       map((packageFromRegistry: NodePackage) => {
