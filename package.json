@@ -14,7 +14,7 @@
     "test": "npm run clean && npm run sandbox:ng-add && npm run test:sandbox",
     "test:unit": "npm run build && jasmine src/**/*_spec.js",
     "test:sandbox": "cd sandbox && npm run lint && npm run test && npm run build",
-    "publish": "npm run build && np"
+    "publish": "npm run build && npm publish"
   },
   "keywords": [
     "schematics"
