@@ -11,6 +11,14 @@ Check the documentation with
 schematics --help
 ```
 
+Run these tasks locally :
+```bash
+npm run build
+npm run link:schematic
+npm run test
+```
+
+
 ### Unit Testing
 
 `npm run test` will run the unit tests, using Jasmine as a runner and test framework.
