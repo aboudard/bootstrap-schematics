@@ -1,9 +1,14 @@
 {
-  "name": "bootstrap-schematics",
+  "name": "@aboudard/bootstrap-schematics",
   "version": "1.0.0",
   "description": "Angular schematics for bootstrap",
-  "repository": "aboudard/bootstrap-schematic",
-  "bugs": "https://github.com/aboudard/bootstrap-schematic/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aboudard/bootstrap-schematic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aboudard/bootstrap-schematic/issues"
+  },
   "homepage": "https://github.com/aboudard/bootstrap-schematic",
   "scripts": {
     "build": "tsc -p tsconfig.json",
