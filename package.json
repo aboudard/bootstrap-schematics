@@ -1,6 +1,6 @@
 {
   "name": "bootstrap-schematics",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Angular schematics for bootstrap",
   "repository": "aboudard/bootstrap-schematic",
   "bugs": "https://github.com/aboudard/bootstrap-schematic/issues",
