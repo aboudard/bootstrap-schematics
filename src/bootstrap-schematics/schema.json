@@ -12,6 +12,11 @@
                 "index": 0
             },
             "x-prompt": "Would you like to remove default styles.scss / styles.css from the project ?"
+        },
+        "replaceAppTemplate": {
+            "description": "When true, removes content of the app.component.html template",
+            "type": "boolean",
+            "x-prompt": "Would you like to remove default app.component.html content and replace with bootstrap tags ?"
         }
     },
     "required": []

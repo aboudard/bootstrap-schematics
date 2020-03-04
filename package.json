@@ -1,6 +1,6 @@
 {
   "name": "@aboudard/bootstrap-schematics",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Angular schematics for bootstrap",
   "repository": {
     "type": "git",
@@ -13,9 +13,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
-    "link:schematic": "npm link && cd sandbox && npm link \"bootstrap-schematics\"",
-    "sandbox:ng-add": "cd sandbox && ng g bootstrap-schematics:ng-add",
+    "link:schematic": "npm link && cd sandbox && npm link @aboudard/bootstrap-schematics",
+    "sandbox:ng-add": "cd sandbox && ng g @aboudard/bootstrap-schematics:ng-add",
     "clean": "git checkout HEAD -- sandbox && git clean -f -d sandbox",
+    "buildschematics": "npm run build && npm run link:schematic && npm run clean && npm run sandbox:ng-add",
     "test": "npm run clean && npm run sandbox:ng-add && npm run test:sandbox",
     "test:unit": "npm run build && jasmine src/**/*_spec.js",
     "test:sandbox": "cd sandbox && npm run lint && npm run test && npm run build",

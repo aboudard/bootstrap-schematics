@@ -1,0 +1,1 @@
+export const angularFontawesomeVersion = '~0.6.0';

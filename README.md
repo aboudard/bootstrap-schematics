@@ -1,6 +1,15 @@
-# Getting Started With Schematics
+# Angular Schematics for Bootstrap
 
-This repository is a basic Schematic implementation that serves as a starting point to create and publish Schematics to NPM.
+List of tools to add Bootstrap to an Angular project with @ng-bootstrap/ng-bootstrap and basic scss override. It does write in angular.json config file and can remove the default styles.css file.
+
+## Using Shematics
+
+- Create a new project with Angular CLI
+- Simply add the package
+```bash
+ng add @aboudard/bootstrap-schematics
+```
+- Eventually remove the current package
 
 ### Testing
 
@@ -11,13 +20,16 @@ Check the documentation with
 schematics --help
 ```
 
-Run these tasks locally :
+Run these tasks locally to see the results of schematics in the sandbox app :
 ```bash
 npm run build
 npm run link:schematic
 npm run test
 ```
-
+Or run without app tests :
+```bash
+npm run buildschematics
+```
 
 ### Unit Testing
 

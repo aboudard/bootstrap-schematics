@@ -14,6 +14,7 @@ export function bootstrapSchematics(_options: any): Rule {
       updateDependencies(),
       installDependencies(),
       _options.removeStyles ? removeFiles() : noop(),
+      _options.replaceAppTemplate ? replaceAppComponent() : noop(),
       addBootstrapFiles(),
       modifyAngularJson(_options)
     ])(tree, _context);
@@ -63,9 +64,9 @@ function updateDependencies(): Rule {
 }
 
 function installDependencies(): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    _context.addTask(new NodePackageInstallTask());
-    _context.logger.debug('✅️ Dependencies installed');
+  return (tree: Tree, context: SchematicContext) => {
+    context.addTask(new NodePackageInstallTask());
+    context.logger.debug('✅️ Dependencies installed');
     return tree;
   };
 }
@@ -100,7 +101,7 @@ function modifyAngularJson(options: any): Rule {
       const projectStylesOptionsJson = angularJsonVal["projects"][project]["architect"]["build"]["options"];
       const projectStylesTestJson = angularJsonVal["projects"][project]["architect"]["test"]["options"];
       const styles = [
-        "src/assets/vendor.scss"
+        "src/assets/vendor.scss", "src/assets/main.scss"
       ];
       if (options.removeStyles) {
         projectStylesOptionsJson["styles"] = styles;
@@ -109,7 +110,6 @@ function modifyAngularJson(options: any): Rule {
         Array.prototype.push.apply(projectStylesOptionsJson["styles"], styles);
         Array.prototype.push.apply(projectStylesTestJson["styles"], styles);
       }
-
 
       context.logger.debug(
         `Adding bootstrap scss override in angular.json style`
@@ -123,5 +123,20 @@ function modifyAngularJson(options: any): Rule {
     } else {
       throw new SchematicsException("angular.json not found");
     }
+  }
+}
+
+function replaceAppComponent(): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+
+    tree.overwrite("./src/app/app.component.html",
+      `<div class="container">
+      <span>{{ title }} app is running!</span>
+    </div>`);
+
+    context.logger.debug(
+      `Adding bootstrap html tags in app.component.html template`
+    );
+    return tree;
   }
 }
