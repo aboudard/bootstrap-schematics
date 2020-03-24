@@ -1,0 +1,47 @@
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 50px;
+    line-height: 50px; /* Vertically center the text there */
+    background-color: #005ea8;
+  }
+  
+  .footer .copy {
+    float: left;
+    width: 25%;
+    color: #fff;
+    text-align: left;
+    padding-left: 3em;
+  }
+  
+  .footer .copy span {
+    color: #fff;
+  }
+  
+  .footer .contenu {
+    float: left;
+    width: 75%;
+    background: #f1f1f1;
+    height: 50px;
+  }
+  
+  .footer .contenu .in {
+    padding: 0 4em;
+    font-size: 0.8em;
+  }
+  
+  .footer .contenu:before {
+    content: '';
+    display: block;
+    position: relative;
+    left: -26px;
+    top: 0;
+    width: 0;
+    height: 50px;
+    border: 25px solid transparent;
+    background: #005ea8;
+    float: left;
+    transform: skew(-26deg);
+  }

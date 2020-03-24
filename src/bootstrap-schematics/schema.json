@@ -14,9 +14,21 @@
             "x-prompt": "Would you like to remove default styles.scss / styles.css from the project ?"
         },
         "replaceAppTemplate": {
-            "description": "When true, removes content of the app.component.html template",
+            "description": "When true, replaces the app.component and adds other components",
             "type": "boolean",
-            "x-prompt": "Would you like to remove default app.component.html content and replace with bootstrap tags ?"
+            "x-prompt": "Would you like to remove default app.component and replace with bootstrap components ?"
+        },
+        "installFontAwesome": {
+            "description": "When true, installs font awesome and minimal config",
+            "type": "boolean",
+            "x-prompt": "Would you like to install font awesome and init minimal config ?"
+        },
+        "project": {
+            "type": "string",
+            "description": "The name of the project.",
+            "$default": {
+                "$source": "projectName"
+            }
         }
     },
     "required": []

@@ -1,27 +1,85 @@
-import { Rule, SchematicContext, Tree, chain, mergeWith, apply, url, move, SchematicsException, noop } from '@angular-devkit/schematics';
-import { Observable, concat, of } from "rxjs";
-import { concatMap, map } from "rxjs/operators";
 import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks";
-import { getLatestNodeVersion, NodePackage, parseJsonAtPath } from '../utility/util';
+import { parseJsonAtPath } from '../utility/util';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
+import { bootstrapVersion, ngBootstrapVersion, ngLocalizeVersion } from './versions';
+import { Schema } from './schema';
+import { Rule, SchematicContext, Tree, chain, externalSchematic, noop, mergeWith, apply, url, move, SchematicsException, template, Source, forEach } from '@angular-devkit/schematics';
+import { InsertChange } from '@schematics/angular/utility/change';
+import { getWorkspace } from '@schematics/angular/utility/config';
+import { createSourceFile, ScriptTarget } from 'typescript';
+import { WorkspaceProject } from '@angular-devkit/core/src/experimental/workspace';
+import { getAppModulePath } from '@schematics/angular/utility/ng-ast-utils';
+import { addImportToModule } from '@schematics/angular/utility/ast-utils';
 
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
-export function bootstrapSchematics(_options: any): Rule {
+export function bootstrapSchematics(_options: Schema): Rule {
+
+  let angularJsonVal;
+  let project;
+
   return (tree: Tree, _context: SchematicContext) => {
     console.log(_options);
+
+    angularJsonVal = getAngularJsonValue(tree);
+    project = getProject(angularJsonVal);
+
     return chain([
+      _options.installFontAwesome ? addFontAwesome() : noop(),
       updateDependencies(),
       installDependencies(),
-      _options.removeStyles ? removeFiles() : noop(),
-      _options.replaceAppTemplate ? replaceAppComponent() : noop(),
+      _options.removeStyles ? removeCssFiles() : noop(),
+      _options.replaceAppTemplate ? addComponents(_options) : noop(),
       addBootstrapFiles(),
-      modifyAngularJson(_options)
+      modifyAngularJson(_options, angularJsonVal, project),
+      addModule(_options.project),
     ])(tree, _context);
   };
 }
 
-function removeFiles(): Rule {
+
+function addFontAwesome(): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    context.logger.debug("Adding fontawesome files");
+    return chain([
+      externalSchematic('@fortawesome/angular-fontawesome', 'ng-add', {
+        project: 'sandbox'
+      }),
+      mergeWith(apply(url("./fa-files"), [move("./src/app/shared/services")]))
+    ])(
+      tree,
+      context
+    );
+  };
+}
+
+
+function addModule(projectName?: string): Rule {
+  return (tree: Tree) => {
+    const workspace = getWorkspace(tree);
+    const project = workspace.projects[projectName || workspace.defaultProject!];
+    const buildOptions = getProjectTargetOptions(project, 'build');
+    const modulePath = getAppModulePath(tree, buildOptions.main);
+    const moduleSource = getSourceFile(tree, modulePath);
+    const changes = addImportToModule(
+      moduleSource,
+      modulePath,
+      'CompModule',
+      './comp/comp.module'
+    );
+    const recorder = tree.beginUpdate(modulePath);
+    changes.forEach((change) => {
+      if (change instanceof InsertChange) {
+        recorder.insertLeft(change.pos, change.toAdd);
+      }
+    });
+    tree.commitUpdate(recorder);
+
+    return tree;
+  }
+}
+
+function removeCssFiles(): Rule {
   return (tree: Tree, context: SchematicContext) => {
     context.logger.debug("Removing styles default file");
     if (tree.exists("./src/styles.scss")) {
@@ -35,31 +93,29 @@ function removeFiles(): Rule {
 
 function updateDependencies(): Rule {
   // let removeDependencies: Observable<Tree>;
-  return (tree: Tree, context: SchematicContext): Observable<Tree> => {
+  return (tree: Tree, context: SchematicContext) => {
     context.logger.debug("Updating dependencies...");
     context.addTask(new NodePackageInstallTask());
-    const addDependencies = of(
-      "bootstrap",
-      "@ng-bootstrap/ng-bootstrap",
-      "@angular/localize"
-    ).pipe(
-      concatMap((packageName: string) => getLatestNodeVersion(packageName)),
-      map((packageFromRegistry: NodePackage) => {
-        const { name, version } = packageFromRegistry;
-        context.logger.debug(
-          `Adding ${name}:${version} to ${NodeDependencyType.Dev}`
-        );
 
-        addPackageJsonDependency(tree, {
-          type: NodeDependencyType.Dev,
-          name,
-          version
-        });
+    addPackageJsonDependency(tree, {
+      type: NodeDependencyType.Default,
+      name: 'bootstrap',
+      version: bootstrapVersion,
+    });
 
-        return tree;
-      })
-    );
-    return concat(addDependencies);
+    addPackageJsonDependency(tree, {
+      type: NodeDependencyType.Default,
+      name: '@ng-bootstrap/ng-bootstrap',
+      version: ngBootstrapVersion,
+    });
+
+    addPackageJsonDependency(tree, {
+      type: NodeDependencyType.Default,
+      name: '@angular/localize',
+      version: ngLocalizeVersion,
+    });
+
+    return tree;
   }
 }
 
@@ -84,20 +140,20 @@ function addBootstrapFiles(): Rule {
   };
 }
 
-function getAngularJsonValue(tree: Tree) {
+function getAngularJsonValue(tree: Tree): any {
   const angularJsonAst = parseJsonAtPath(tree, "./angular.json");
   return angularJsonAst.value as any;
 }
 
-function getProject(angularJsonValue: any) {
+function getProject(angularJsonValue: any): string {
   return angularJsonValue.defaultProject;
 }
 
-function modifyAngularJson(options: any): Rule {
+function modifyAngularJson(options: Schema, angularJsonVal: any, project: string): Rule {
   return (tree: Tree, context: SchematicContext) => {
     if (tree.exists("./angular.json")) {
-      const angularJsonVal = getAngularJsonValue(tree);
-      const project = getProject(angularJsonVal);
+      // const angularJsonVal = getAngularJsonValue(tree);
+      // const project = getProject(angularJsonVal);
       const projectStylesOptionsJson = angularJsonVal["projects"][project]["architect"]["build"]["options"];
       const projectStylesTestJson = angularJsonVal["projects"][project]["architect"]["test"]["options"];
       const styles = [
@@ -126,17 +182,56 @@ function modifyAngularJson(options: any): Rule {
   }
 }
 
-function replaceAppComponent(): Rule {
-  return (tree: Tree, context: SchematicContext) => {
-
-    tree.overwrite("./src/app/app.component.html",
-      `<div class="container">
-      <span>{{ title }} app is running!</span>
-    </div>`);
-
-    context.logger.debug(
-      `Adding bootstrap html tags in app.component.html template`
-    );
-    return tree;
-  }
+function addComponents(_options: Schema): Rule {
+  return () => {
+    const rule =
+      applyWithOverwrite(url('./files'), [
+        template({
+          ..._options,
+        }),
+      ]);
+    return rule;
+  };
 }
+
+function applyWithOverwrite(source: Source, rules: Rule[]): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    const rule = mergeWith(
+      apply(source, [
+        ...rules,
+        forEach((fileEntry) => {
+          if (tree.exists(fileEntry.path)) {
+            tree.overwrite(fileEntry.path, fileEntry.content);
+            return null;
+          }
+          return fileEntry;
+        }),
+
+      ]),
+    );
+
+    return rule(tree, _context);
+  };
+}
+
+function getSourceFile(host: Tree, path: string) {
+  const buffer = host.read(path);
+  if (!buffer) {
+    throw new SchematicsException(`Could not find ${path}.`);
+  }
+  const content = buffer.toString('utf-8');
+  return createSourceFile(path, content, ScriptTarget.Latest, true);
+}
+
+export function getProjectTargetOptions(project: WorkspaceProject, buildTarget: string) {
+  if (project.targets && project.targets[buildTarget] && project.targets[buildTarget].options) {
+    return project.targets[buildTarget].options;
+  }
+
+  if (project.architect && project.architect[buildTarget] && project.architect[buildTarget].options) {
+    return project.architect[buildTarget].options;
+  }
+
+  throw new SchematicsException(`Cannot determine project target configuration for: ${buildTarget}.`);
+}
+
