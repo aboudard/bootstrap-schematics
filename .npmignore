@@ -2,4 +2,4 @@
 *.ts
 !*.d.ts
 # Not ignoring component files
-!src/*/**/*.ts
+!src/bootstrap-schematics/**/*.ts
