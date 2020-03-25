@@ -25,7 +25,7 @@ export function bootstrapSchematics(_options: Schema): Rule {
     project = getProject(angularJsonVal);
 
     return chain([
-      _options.installFontAwesome ? addFontAwesome() : noop(),
+      _options.installFontAwesome ? addFontAwesome(project) : noop(),
       updateDependencies(),
       installDependencies(),
       _options.removeStyles ? removeCssFiles() : noop(),
@@ -37,13 +37,16 @@ export function bootstrapSchematics(_options: Schema): Rule {
   };
 }
 
-
-function addFontAwesome(): Rule {
+/**
+ * Do not specify version since it's in the local package.json file
+ * @param project : ng project that schematics run on
+ */
+function addFontAwesome(project: string): Rule {
   return (tree: Tree, context: SchematicContext) => {
     context.logger.debug("Adding fontawesome files");
     return chain([
       externalSchematic('@fortawesome/angular-fontawesome', 'ng-add', {
-        project: 'sandbox'
+        project: project
       }),
       mergeWith(apply(url("./fa-files"), [move("./src/app/shared/services")]))
     ])(
