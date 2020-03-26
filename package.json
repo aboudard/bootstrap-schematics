@@ -1,6 +1,6 @@
 {
   "name": "@aboudard/bootstrap-schematics",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Angular schematics for bootstrap",
   "repository": {
     "type": "git",
@@ -20,10 +20,15 @@
     "test": "npm run clean && npm run sandbox:ng-add && npm run test:sandbox",
     "test:unit": "npm run build && jasmine src/**/*_spec.js",
     "test:sandbox": "cd sandbox && npm run lint && npm run test && npm run build",
-    "publish": "npm run build && npm publish"
+    "publishpackage": "npm run build && npm publish"
   },
   "keywords": [
-    "schematics"
+    "schematics",
+    "angular",
+    "bootstrap"
+  ],
+  "files": [
+    "src"
   ],
   "author": "aboudard",
   "license": "MIT",
