@@ -35,15 +35,15 @@ function addComponent(): Rule {
     const content: Buffer | null = tree.read(filePath);
     let strContent: string = "";
     if (content) strContent = content.toString("utf8");
-    const $ = cheerio.load(strContent, {});
-    console.log(strContent);
+    const $ = cheerio.load(strContent, {
+      lowerCaseTags: true
+    });
     const contentToInsert = `
     <ngx-spinner bdColor = "rgba(51, 51, 51, 0.8)"
     size = "medium"
     color = "#01afec"
     type = "ball-clip-rotate"></ngx-spinner>`;
     $.root().append(contentToInsert);
-    console.log($.html())
     tree.overwrite(filePath, $.html());
     return tree;
   };

@@ -15,10 +15,10 @@ export class NavbarComponent {
   user: User;
 
   @Input()
-  appTitle: string;
+  apptitle: string;
 
   @Input()
-  urlLogo: string;
+  urllogo: string;
 
   constructor() { }
 

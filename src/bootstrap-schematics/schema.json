@@ -11,17 +11,26 @@
                 "$source": "argv",
                 "index": 0
             },
-            "x-prompt": "Would you like to remove default styles.scss / styles.css from the project ?"
+            "x-prompt": "Would you like to remove default styles.scss / styles.css from the project ?",
+            "default": true
         },
         "replaceAppTemplate": {
             "description": "When true, replaces the app.component and adds other components",
             "type": "boolean",
-            "x-prompt": "Would you like to remove default app.component and replace with bootstrap components ?"
+            "x-prompt": "Would you like to remove default app.component and replace with bootstrap components ?",
+            "default": true
         },
         "installFontAwesome": {
             "description": "When true, installs font awesome and minimal config",
             "type": "boolean",
-            "x-prompt": "Would you like to install font awesome and init minimal config ?"
+            "x-prompt": "Would you like to install font awesome and init minimal config ?",
+            "default": true
+        },
+        "installSpinner": {
+            "description": "When true, installs ngx-spinner and minimal config",
+            "type": "boolean",
+            "x-prompt": "Would you like to install ngx-spinner and init minimal config ?",
+            "default": true
         },
         "project": {
             "type": "string",

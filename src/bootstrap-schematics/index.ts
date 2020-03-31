@@ -24,7 +24,7 @@ export function bootstrapSchematics(_options: Schema): Rule {
     return chain([
       _options.installFontAwesome ? addIcones(_options) : noop(),
       updateDependencies(),
-      addSpinner(_options),
+      _options.installSpinner ? addSpinner(_options) : noop(),
       installDependencies(),
       _options.removeStyles ? removeCssFiles() : noop(),
       _options.replaceAppTemplate ? addComponents(_options) : noop(),
