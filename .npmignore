@@ -2,4 +2,5 @@
 *.ts
 !*.d.ts
 # Not ignoring component files
-!src/bootstrap-schematics/**/*.ts
+!src/bootstrap-schematics/files/**/*.ts
+!src/font-awesome/files/**/*.ts

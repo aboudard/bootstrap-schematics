@@ -2,12 +2,20 @@
   "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
     "ng-add": {
-      "description": "A blank schematic.",
+      "description": "A schematic to add bootstrap components and libraries to Angular project.",
       "factory": "./bootstrap-schematics/index#bootstrapSchematics",
       "aliases": [
         "install"
       ],
       "schema": "./bootstrap-schematics/schema.json"
+    },
+    "spinner": {
+      "description": "A schematic to add ngx-spinner.",
+      "factory": "./spinner/index#spinner"
+    },
+    "font-awesome": {
+      "description": "A blank schematic.",
+      "factory": "./font-awesome/index#fontAwesome"
     }
   }
 }

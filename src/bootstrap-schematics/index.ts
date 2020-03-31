@@ -1,15 +1,14 @@
-import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks";
+import { NodePackageInstallTask, RunSchematicTask } from "@angular-devkit/schematics/tasks";
 import { parseJsonAtPath } from '../utility/util';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { bootstrapVersion, ngBootstrapVersion, ngLocalizeVersion } from './versions';
 import { Schema } from './schema';
-import { Rule, SchematicContext, Tree, chain, externalSchematic, noop, mergeWith, apply, url, move, SchematicsException, template, Source, forEach } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, Tree, chain, noop, mergeWith, apply, url, move, SchematicsException, template, Source, forEach } from '@angular-devkit/schematics';
 import { InsertChange } from '@schematics/angular/utility/change';
 import { getWorkspace } from '@schematics/angular/utility/config';
-import { createSourceFile, ScriptTarget } from 'typescript';
-import { WorkspaceProject } from '@angular-devkit/core/src/experimental/workspace';
 import { getAppModulePath } from '@schematics/angular/utility/ng-ast-utils';
 import { addImportToModule } from '@schematics/angular/utility/ast-utils';
+import { installDependencies, getProjectTargetOptions, getSourceFile } from "../utility/custom";
 
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
@@ -19,14 +18,13 @@ export function bootstrapSchematics(_options: Schema): Rule {
   let project;
 
   return (tree: Tree, _context: SchematicContext) => {
-    console.log(_options);
-
     angularJsonVal = getAngularJsonValue(tree);
     project = getProject(angularJsonVal);
 
     return chain([
-      _options.installFontAwesome ? addFontAwesome(project) : noop(),
+      _options.installFontAwesome ? addIcones(_options) : noop(),
       updateDependencies(),
+      addSpinner(_options),
       installDependencies(),
       _options.removeStyles ? removeCssFiles() : noop(),
       _options.replaceAppTemplate ? addComponents(_options) : noop(),
@@ -37,22 +35,20 @@ export function bootstrapSchematics(_options: Schema): Rule {
   };
 }
 
-/**
- * Do not specify version since it's in the local package.json file
- * @param project : ng project that schematics run on
- */
-function addFontAwesome(project: string): Rule {
-  return (tree: Tree, context: SchematicContext) => {
-    context.logger.debug("Adding fontawesome files");
-    return chain([
-      externalSchematic('@fortawesome/angular-fontawesome', 'ng-add', {
-        project: project
-      }),
-      mergeWith(apply(url("./fa-files"), [move("./src/app/shared/services")]))
-    ])(
-      tree,
-      context
-    );
+
+function addSpinner(options: Schema): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    // this tells the schematic to run the spinner schematic found in collection.json as a task
+    _context.addTask(new RunSchematicTask('spinner', options));
+    return tree;
+  };
+}
+
+function addIcones(options: Schema): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    // this tells the schematic to run the font-awesome schematic found in collection.json as a task
+    _context.addTask(new RunSchematicTask('font-awesome', options));
+    return tree;
   };
 }
 
@@ -95,7 +91,6 @@ function removeCssFiles(): Rule {
 }
 
 function updateDependencies(): Rule {
-  // let removeDependencies: Observable<Tree>;
   return (tree: Tree, context: SchematicContext) => {
     context.logger.debug("Updating dependencies...");
     context.addTask(new NodePackageInstallTask());
@@ -120,14 +115,6 @@ function updateDependencies(): Rule {
 
     return tree;
   }
-}
-
-function installDependencies(): Rule {
-  return (tree: Tree, context: SchematicContext) => {
-    context.addTask(new NodePackageInstallTask());
-    context.logger.debug('✅️ Dependencies installed');
-    return tree;
-  };
 }
 
 function addBootstrapFiles(): Rule {
@@ -215,26 +202,5 @@ function applyWithOverwrite(source: Source, rules: Rule[]): Rule {
 
     return rule(tree, _context);
   };
-}
-
-function getSourceFile(host: Tree, path: string) {
-  const buffer = host.read(path);
-  if (!buffer) {
-    throw new SchematicsException(`Could not find ${path}.`);
-  }
-  const content = buffer.toString('utf-8');
-  return createSourceFile(path, content, ScriptTarget.Latest, true);
-}
-
-export function getProjectTargetOptions(project: WorkspaceProject, buildTarget: string) {
-  if (project.targets && project.targets[buildTarget] && project.targets[buildTarget].options) {
-    return project.targets[buildTarget].options;
-  }
-
-  if (project.architect && project.architect[buildTarget] && project.architect[buildTarget].options) {
-    return project.architect[buildTarget].options;
-  }
-
-  throw new SchematicsException(`Cannot determine project target configuration for: ${buildTarget}.`);
 }
 

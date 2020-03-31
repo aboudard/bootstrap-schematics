@@ -1,6 +1,6 @@
 {
   "name": "@aboudard/bootstrap-schematics",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "Angular schematics for bootstrap",
   "repository": {
     "type": "git",
@@ -38,14 +38,17 @@
     "@angular-devkit/schematics": "^9.0.4",
     "@fortawesome/angular-fontawesome": "0.6.0",
     "@schematics/angular": "9.0.5",
+    "cheerio": "^0.22.0",
+    "ngx-spinner": "^9.0.1",
     "typescript": "~3.7.4"
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
-    "@types/node": "^12.11.1",
+    "@types/cheerio": "^0.22.17",
     "@types/jasmine": "~3.5.0",
+    "@types/node": "^12.11.1",
     "jasmine": "^3.5.0"
   }
 }
