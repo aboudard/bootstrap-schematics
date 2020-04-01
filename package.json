@@ -1,6 +1,6 @@
 {
   "name": "@aboudard/bootstrap-schematics",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Angular schematics for bootstrap",
   "repository": {
     "type": "git",
