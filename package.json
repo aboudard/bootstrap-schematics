@@ -1,0 +1,54 @@
+{
+  "name": "@aboudard/bootstrap-schematics",
+  "version": "1.1.2",
+  "description": "Angular schematics for bootstrap",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aboudard/bootstrap-schematics.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aboudard/bootstrap-schematics/issues"
+  },
+  "homepage": "https://github.com/aboudard/bootstrap-schematics",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -p tsconfig.json --watch",
+    "link:schematic": "npm link && cd sandbox && npm link @aboudard/bootstrap-schematics",
+    "sandbox:ng-add": "cd sandbox && ng g @aboudard/bootstrap-schematics:ng-add",
+    "clean": "git checkout HEAD -- sandbox && git clean -f -d sandbox",
+    "buildschematics": "npm run build && npm run link:schematic && npm run clean && npm run sandbox:ng-add",
+    "test": "npm run clean && npm run sandbox:ng-add && npm run test:sandbox",
+    "test:unit": "npm run build && jasmine src/**/*_spec.js",
+    "test:sandbox": "cd sandbox && npm run lint && npm run test && npm run build",
+    "publishpackage": "npm run build && npm publish"
+  },
+  "keywords": [
+    "schematics",
+    "angular",
+    "bootstrap"
+  ],
+  "files": [
+    "src"
+  ],
+  "author": "aboudard",
+  "license": "MIT",
+  "schematics": "./src/collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "^9.0.4",
+    "@angular-devkit/schematics": "^9.0.4",
+    "@fortawesome/angular-fontawesome": "0.6.0",
+    "@schematics/angular": "9.0.5",
+    "cheerio": "^0.22.0",
+    "ngx-spinner": "^9.0.1",
+    "typescript": "~3.7.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.17",
+    "@types/jasmine": "~3.5.0",
+    "@types/node": "^12.11.1",
+    "jasmine": "^3.5.0"
+  }
+}

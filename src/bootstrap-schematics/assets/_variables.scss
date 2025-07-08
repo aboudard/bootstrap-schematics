@@ -1,0 +1,17 @@
+$theme-colors: (
+  primary: #005ea8,
+  success: #8bc34a,
+  info: #01afec,
+  warning: #ee7330,
+  danger: #f40006,
+) !default;
+
+$nav-tabs-link-active-bg: map-get($theme-colors, "info") !default;
+$nav-tabs-border-color: map-get($theme-colors, "info") !default;
+$nav-tabs-border-radius: 0 !important;
+$nav-tabs-link-active-border-color : $nav-tabs-link-active-bg;
+$nav-tabs-link-active-color: white;
+$nav-tabs-border-width: 0;
+$form-group-margin-bottom: 0.5rem;
+$table-dark-bg: map-get($theme-colors, "primary") !default;
+$table-dark-border-color: darken($table-dark-bg, 5);
